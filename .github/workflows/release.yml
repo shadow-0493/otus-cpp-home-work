@@ -13,8 +13,29 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: true
+
+      - name: Read test framework from config
+        id: ci-config
+        run: |
+          USE_TEST=$(jq -r '.USE_TEST' config.json)
+          echo "USE_TEST=$USE_TEST" >> $GITHUB_OUTPUT
+    
+      - name: Load Boost Test Lib
+        if: steps.ci-config.outputs.USE_TEST == 'boost'
+        run: sudo apt-get update && sudo apt-get install libboost-test-dev -y
+
+      - name: Load Google Test Lib
+        if: steps.read-config.outputs.USE_TEST == 'gtest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtest-dev cmake
+          cd /usr/src/gtest
+          sudo cmake CMakeLists.txt
+          sudo make
+          sudo cp lib/*.a /usr/lib
+
       - run: sudo apt-get update && sudo apt-get install libboost-test-dev -y
-      - run: cmake . -DPATCH_VERSION=${{ github.run_number }} -DWITH_BOOST_TEST=ON
+      - run: cmake . -DPATCH_VERSION=${{ github.run_number }} -DWITH_BOOST_TEST=ON -DUSE_TESTS=${{ steps.ci-config.outputs.USE_TEST }}
       - run: cmake --build .
       - run: cmake --build . --target test
       - run: cmake --build . --target package
