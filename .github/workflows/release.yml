@@ -19,14 +19,14 @@ jobs:
         run: |
           USE_TEST=$(jq -r '.USE_TEST' config.json)
           echo "USE_TEST=$USE_TEST" >> $GITHUB_OUTPUT
-          echo "USE_TESTS=${{ steps.ci-config.outputs.USE_TEST }}"
+          echo "USE_TEST=${{ steps.ci-config.outputs.USE_TEST }}"
     
       - name: Load Boost Test Lib
         if: steps.ci-config.outputs.USE_TEST == 'boost'
         run: sudo apt-get update && sudo apt-get install libboost-test-dev -y
 
       - name: Load Google Test Lib
-        if: steps.read-config.outputs.USE_TEST == 'gtest'
+        if: steps.ci-config.outputs.USE_TEST == 'gtest'
         run: |
           sudo apt-get update
           sudo apt-get install -y libgtest-dev cmake
