@@ -19,7 +19,7 @@ jobs:
         run: |
           USE_TEST=$(jq -r '.USE_TEST' config.json)
           echo "USE_TEST=$USE_TEST" >> $GITHUB_OUTPUT
-          echo "USE_TESTS=${{ steps.ci-config.outputs.USE_TEST }}""
+          echo "USE_TESTS=${{ steps.ci-config.outputs.USE_TEST }}"
     
       - name: Load Boost Test Lib
         if: steps.ci-config.outputs.USE_TEST == 'boost'
